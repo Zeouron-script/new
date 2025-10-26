@@ -1,3 +1,5 @@
+--fuck
+
 local Supported = T.GetConfig("Supported")
 
 for name,value in pairs(Supported) do
