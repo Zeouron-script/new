@@ -7,7 +7,7 @@
 </p>
 
 ## What can i use it for?
-You can use Zeouron for exploiting, on the following games:
+You can use Zeouron on the following games:
 - Randomly Generated Droids
 - Hours
 - Robot 64
