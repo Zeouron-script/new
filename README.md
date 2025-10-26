@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./readme/white.png">
-    <source media="(prefers-color-scheme: light)" srcset="./readme/dark.png">
+    <source media="(prefers-color-scheme: dark)" srcset="./readme/logowhite.png">
+    <source media="(prefers-color-scheme: light)" srcset="./readme/logodark.png">
     <img alt="Zeouron" src="./readme/logo.png">
   </picture>
 </p>
