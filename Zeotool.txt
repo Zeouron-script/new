@@ -45,6 +45,14 @@ Time,
 Value
 }]]
 
+constructcolor = function(str)
+    local split = string.split(str,",")
+    return Color3.fromRGB(tonumber(split[1]),tonumber(split[2]), tonumber(split[3]))
+end
+halvecolor = function(color, num)
+    return Color3.new(color.R /num, color.G /num, color.B /num)
+end
+
 Contents.GetSettings = function(raw)
     if raw then
         return game:GetService("HttpService"):JSONDecode(readfile("Zeouron/Profiles/Settings.txt"))
@@ -146,13 +154,6 @@ Contents.AddStroke = function(frame,color,thickness)
     round.Color = color
     round.Thickness = thickness or 2
     return round
-end
-constructcolor = function(str)
-    local split = string.split(str,",")
-    return Color3.fromRGB(tonumber(split[1]),tonumber(split[2]), tonumber(split[3]))
-end
-halvecolor = function(color, num)
-    return Color3.new(color.R /num, color.G /num, color.B /num)
 end
 Contents.GetTheme = function()
     local s = Contents.GetSettings()
