@@ -20,7 +20,9 @@ local ZeouronGui = Instance.new("ScreenGui",GetGuiParent())
 ZeouronGui.Name = "Zeouron"
 ZeouronGui.ResetOnSpawn = false
 
-local Contents = {}
+Contents = {}
+
+Contents.Github = "https://raw.githubusercontent.com/Zeouron-script/new/refs/heads/main/"
 
 Contents.IsMobile = table.find({Enum.Platform.IOS, Enum.Platform.Android}, UIS:GetPlatform())
 Contents.GetGuiParent = GetGuiParent
@@ -112,7 +114,6 @@ Contents.Tween = function(tble, times)
     PlayThis:Play()
     return PlayThis
 end
-Contents.Github = "https://raw.githubusercontent.com/Zeouron-script/new/refs/heads/main/"
 Contents.DownloadAsset = function(asset)
     local succ,res = pcall(function() return game:HttpGet(Contents.Github.."Assets/"..asset) end)
     if succ and res then
