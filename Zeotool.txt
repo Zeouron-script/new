@@ -22,7 +22,6 @@ ZeouronGui.ResetOnSpawn = false
 
 local Contents = {}
 
-
 Contents.IsMobile = table.find({Enum.Platform.IOS, Enum.Platform.Android}, UIS:GetPlatform())
 Contents.GetGuiParent = GetGuiParent
 Contents.NewGui = function(name,zindex)
@@ -45,6 +44,18 @@ Property,
 Time,
 Value
 }]]
+
+Contents.GetSettings = function(raw)
+    if raw then
+        return game:GetService("HttpService"):JSONDecode(readfile("Zeouron/Profiles/Settings.txt"))
+    end
+    local s = game:GetService("HttpService"):JSONDecode(readfile("Zeouron/Profiles/Settings.txt"))
+    s.MainColor = constructcolor(s.MainColor)
+    s.BackgroundColor = constructcolor(s.BackgroundColor)
+    return s
+end
+
+Contents.Developer = Contents.GetSettings().Developer
 
 Contents.Tween = function(tble, times)
     local TweenInf0 = TweenInfo.new(tble[3]) 
@@ -74,12 +85,14 @@ if you dont know, the path to it is: "workspace/Zeouron/Profiles/Settings.txt"
 
 Good luck, whoever you are.]],true)
 
-	add("Zeouron/Version.txt","b",true)
+	add("Zeouron/Version.txt",game:HttpGet(Contents.Github.."Version.txt"),true)
  
  	add("Zeouron/Libraries","",false,true)
  	add("Zeouron/Configurations","",false,true)
  	add("Zeouron/Fragments","",false,true)
  	add("Zeouron/Assets","",false,true)
+  
+  	add("Zeouron/Loader.lua",game:HttpGet(Contents.Github.."Loader.lua"),not Contents.Developer)
 	
  	add("Zeouron/Profiles/Settings.txt",game:GetService("HttpService"):JSONEncode({
         MainColor = "130,35,175",
@@ -141,15 +154,6 @@ end
 halvecolor = function(color, num)
     return Color3.new(color.R /num, color.G /num, color.B /num)
 end
-Contents.GetSettings = function(raw)
-    if raw then
-        return game:GetService("HttpService"):JSONDecode(readfile("Zeouron/Profiles/Settings.txt"))
-    end
-    local s = game:GetService("HttpService"):JSONDecode(readfile("Zeouron/Profiles/Settings.txt"))
-    s.MainColor = constructcolor(s.MainColor)
-    s.BackgroundColor = constructcolor(s.BackgroundColor)
-    return s
-end
 Contents.GetTheme = function()
     local s = Contents.GetSettings()
     return {
@@ -162,8 +166,6 @@ Contents.GetTheme = function()
         DiscordLink = "https://discord.com/invite/BjrHC26rUP"
     }
 end
-
-Contents.Developer = Contents.GetSettings().Developer
 
 local G = Contents.NewGui("ZeoTool",100)
 
