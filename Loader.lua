@@ -1,16 +1,16 @@
 local Supported = T.GetConfig("Supported")
 
-for name,game in pairs(Supported) do
-	if typeof(game) == "table" then
-    	for i,v in pairs(game) do
+for name,value in pairs(Supported) do
+	if typeof(value) == "table" then
+    	for i,v in pairs(value) do
         	if tonumber(i) == game.PlaceId then
             	if typeof(v) == "function" then v() end
              	if typeof(v) == "string" then T.GetFragment(v) end
               	return
             end
         end
-    elseif typeof(game) == "function" then
-    	if game() then
+    elseif typeof(value) == "function" then
+    	if value() then
         	T.GetFragment(name)
          	return
         end
@@ -18,3 +18,4 @@ for name,game in pairs(Supported) do
 end
 
 T.Notification("Error","Zeouron doesnt support this game.",10)
+
