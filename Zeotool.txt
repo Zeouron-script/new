@@ -45,32 +45,6 @@ Time,
 Value
 }]]
 
-constructcolor = function(str)
-    local split = string.split(str,",")
-    return Color3.fromRGB(tonumber(split[1]),tonumber(split[2]), tonumber(split[3]))
-end
-halvecolor = function(color, num)
-    return Color3.new(color.R /num, color.G /num, color.B /num)
-end
-
-Contents.GetSettings = function(raw)
-    if raw then
-        return game:GetService("HttpService"):JSONDecode(readfile("Zeouron/Profiles/Settings.txt"))
-    end
-    local s = game:GetService("HttpService"):JSONDecode(readfile("Zeouron/Profiles/Settings.txt"))
-    s.MainColor = constructcolor(s.MainColor)
-    s.BackgroundColor = constructcolor(s.BackgroundColor)
-    return s
-end
-
-Contents.Developer = Contents.GetSettings().Developer
-
-Contents.Tween = function(tble, times)
-    local TweenInf0 = TweenInfo.new(tble[3]) 
-    local PlayThis = game:GetService("TweenService"):Create(tble[1], TweenInf0, {[tble[2]] = tble[4]})
-    PlayThis:Play()
-    return PlayThis
-end
 Contents.ConstructFolder = function()
 	local add = function(path,c,overwrite,f)
     	if not isfile(path) or overwrite then
@@ -108,6 +82,35 @@ Good luck, whoever you are.]],true)
         Font = "Sarpanch",
         Developer = false
     }))
+end
+
+Contents.ConstructFolder()
+
+constructcolor = function(str)
+    local split = string.split(str,",")
+    return Color3.fromRGB(tonumber(split[1]),tonumber(split[2]), tonumber(split[3]))
+end
+halvecolor = function(color, num)
+    return Color3.new(color.R /num, color.G /num, color.B /num)
+end
+
+Contents.GetSettings = function(raw)
+    if raw then
+        return game:GetService("HttpService"):JSONDecode(readfile("Zeouron/Profiles/Settings.txt"))
+    end
+    local s = game:GetService("HttpService"):JSONDecode(readfile("Zeouron/Profiles/Settings.txt"))
+    s.MainColor = constructcolor(s.MainColor)
+    s.BackgroundColor = constructcolor(s.BackgroundColor)
+    return s
+end
+
+Contents.Developer = Contents.GetSettings().Developer
+
+Contents.Tween = function(tble, times)
+    local TweenInf0 = TweenInfo.new(tble[3]) 
+    local PlayThis = game:GetService("TweenService"):Create(tble[1], TweenInf0, {[tble[2]] = tble[4]})
+    PlayThis:Play()
+    return PlayThis
 end
 Contents.Github = "https://raw.githubusercontent.com/Zeouron-script/new/refs/heads/main/"
 Contents.DownloadAsset = function(asset)
