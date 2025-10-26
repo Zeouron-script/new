@@ -1,9 +1,3 @@
-A W.I.P RECODE OF ZEOURON, PLEASE USE 
-```luau
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Zeuxtronic/New-Zeouron/refs/heads/main/Loader.lua", true))()
-```
-
-INSTEAD
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="./readme/logotext-white.png">
