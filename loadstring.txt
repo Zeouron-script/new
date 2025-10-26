@@ -1,0 +1,3 @@
+getgenv().T = loadstring(readfile("zeotool.txt") or game:HttpGet("https://raw.githubusercontent.com/Zeouron-script/new/refs/heads/main/Zeotool.txt"))()
+T.ConstructFolder()
+loadstring(readfile("Zeouron/Loader.lua"))()
