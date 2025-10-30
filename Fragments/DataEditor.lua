@@ -90,9 +90,14 @@ return function(args)
  	window.Position = UDim2.new(0,workspace.CurrentCamera.ViewportSize.X /2,0,workspace.CurrentCamera.ViewportSize.Y /2)
 	window.BackgroundColor3 = Data.BgC
 	window.Visible = false
+ 	window.ZIndex = 1000
 	window.Parent = G
 	T.AddBlur(window)
 	T.AddRound(window)
+ 
+ 	window.DescendantAdded:Connect(function(v)
+    	v.ZIndex += 1000
+    end)
  
  	local textlabel = Instance.new("TextLabel")
 	textlabel.Size = UDim2.new(1,0,0,25)
