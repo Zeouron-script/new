@@ -73,8 +73,12 @@ render.NewModule(function(module)
     })
 end)
 
-local MaxSkins = #game:GetService("ReplicatedFirst").skins:GetChildren()
-local MaxHats = #game:GetService("ReplicatedFirst").hats:GetChildren()
+local assets = game:GetService("ReplicatedStorage"):FindFirstChild("Assets") or game:GetService("ReplicatedFirst")
+local skins = assets:FindFirstChild("skins")
+local hats = assets:FindFirstChild("hats")
+
+local MaxSkins = #skins:GetChildren()
+local MaxHats = #hats:GetChildren()
 render.NewModule(function(module)
     local skin,hat
     randomize = module.NewButton({
@@ -248,7 +252,7 @@ blatant.NewModule(function(module)
         	local Y = 50
             repeat
             	workspace.char.Position += Vector3.new(0,Y -workspace.char.Position.Y,0)
-             	task.wait() 
+             	task.wait()
             until not fly.Toggled
         end
     })
@@ -395,7 +399,7 @@ data.NewModule(function(module)
         Function = function(val)
             for i, v in pairs(Mem.lockskin) do
                 local obt
-                for _, v in pairs(rf.skins:GetChildren()) do
+                for _, v in pairs(skins:GetChildren()) do
                     if v.id.Value == i then
                         obt = v
                     	break
