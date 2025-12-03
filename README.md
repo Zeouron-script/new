@@ -14,7 +14,7 @@ You can use Zeouron on the following games:
 
 ## How to use
 1. Use an executor. If you dont have one, these are some recommended executors:
-- Mobile: [Krnl](krnl.cat), [Delta](deltaexploits.gg)
+- Mobile: [Delta](deltaexploits.gg)
 - Desktop: [Swift](getswift.vip)
 
 2. Execute the following code while in a game:
