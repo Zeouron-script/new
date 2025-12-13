@@ -13,7 +13,7 @@ You can use Zeouron on the following games:
 - Robot 64
 
 ## How to use
-1. Use an executor. If you dont have one, these are some recommended executors:
+1. Use a scripting utility. If you dont have one, these are some recommended executors:
 - Mobile: [Delta](deltaexploits.gg)
 - Desktop: [Swift](getswift.vip)
 
