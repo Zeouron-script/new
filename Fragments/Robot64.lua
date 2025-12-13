@@ -74,8 +74,9 @@ render.NewModule(function(module)
 end)
 
 local assets = game:GetService("ReplicatedStorage"):FindFirstChild("Assets") or game:GetService("ReplicatedFirst")
-local skins = assets:FindFirstChild("skins")
-local hats = assets:FindFirstChild("hats")
+-- zkevin you cant be fr, you broke my entire shit because you decided to capitalize skins and hats
+local skins = assets:FindFirstChild("Skins") or assets:FindFirstChild("skins")
+local hats = assets:FindFirstChild("Hats") or assets:FindFirstChild("hats")
 
 local MaxSkins = #skins:GetChildren()
 local MaxHats = #hats:GetChildren()
@@ -400,7 +401,8 @@ data.NewModule(function(module)
             for i, v in pairs(Mem.lockskin) do
                 local obt
                 for _, v in pairs(skins:GetChildren()) do
-                    if v.id.Value == i then
+                    if v:GetAttribute("id") == i then
+                    
                         obt = v
                     	break
                 	end
