@@ -98,11 +98,36 @@ movement.NewModule(function(module)
 end)
 
 movement.NewModule(function(module)
-    local value,gravity,conn
+    local value,gravity,conn,touchframe,downbutton
+
+    if T.IsMobile then
+        touchframe = lp.PlayerGui.TouchGui.TouchControlFrame
+         
+        downbutton = touchframe.JumpButton:Clone()
+        downbutton.Size = UDim2.new(1,0,1)
+        downbutton.Position = UDim2.new(-1,-20)
+        downbutton.Rotation = 180
+        downbutton.Visible = false
+        downbutton.Parent = touchframe.JumpButton
+        
+        downbutton.MouseButton1Down:Connect(function()
+            downbutton.ImageRectOffset = Vector2.new(146,146)
+        end)
+    
+    	downbutton.MouseLeave:Connect(function()
+            downbutton.ImageRectOffset = Vector2.new(1,146)
+        end)
+    	UI.Clean(downbutton)
+    end
+    
     fly = module.NewSwitch({
         Name = "Fly",
         Tooltip = "Allows you to fly\nX = up\nZ = down",
         Function = function(val)
+         	if downbutton then
+        		downbutton.Visible = val
+          	end
+       
             local Y
             if val then
                 repeat 
@@ -115,12 +140,14 @@ movement.NewModule(function(module)
                 end
             	return
             end
+        
         	conn = RS.Stepped:Connect(function()
             	if lp.character and lp.character:FindFirstChild("HumanoidRootPart") and lp.character:FindFirstChildWhichIsA("Humanoid") then
                  	if not Y then
                     	Y = lp.character.HumanoidRootPart.Position.Y
                     end
-                 	local up = not T.IsMobile and ((UIS:IsKeyDown(Enum.KeyCode.X) and 1) or (UIS:IsKeyDown(Enum.KeyCode.Z) and -1) or 0) or (lp.PlayerGui.TouchGui.TouchControlFrame.JumpButton.ImageRectOffset.X == 146 and 1 or 0)
+                 	local up = not T.IsMobile and ((UIS:IsKeyDown(Enum.KeyCode.X) and 1) or (UIS:IsKeyDown(Enum.KeyCode.Z) and -1) or 0) or 
+                  	((touchframe.JumpButton.ImageRectOffset.X == 146 and 1) or (downbutton.ImageRectOffset.X == 146 and -1) or 0)
                  
                  	local movedir = lp.character:FindFirstChildWhichIsA("Humanoid").MoveDirection
                 	local root = lp.character.HumanoidRootPart

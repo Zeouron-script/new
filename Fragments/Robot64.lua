@@ -4,6 +4,7 @@ local RS = game:GetService("RunService")
 local Mem = getsenv(game:GetService("Players").LocalPlayer.PlayerScripts.CharacterScript)
 
 local rf = game:GetService("ReplicatedFirst")
+local UIS = game:GetService("UserInputService")
 
 local UI = T.GetLibrary("UI Library")
 
@@ -247,12 +248,18 @@ blatant.NewModule(function(module)
     local value
     fly = module.NewSwitch({
         Name = "Fly",
-        --Tooltip = 'Uses "infwater" to allow you to swim in air, but makes you walk in water',
+        Tooltip = "Allows you to fly\nX = up\nZ = down",
         Function = function(val)
             if not val then return end
-        	local Y = 50
+        	local Y = workspace.char.Position.Y
             repeat
-            	workspace.char.Position += Vector3.new(0,Y -workspace.char.Position.Y,0)
+                Y += (UIS:IsKeyDown(Enum.KeyCode.X) and 1 or 0) + (UIS:IsKeyDown(Enum.KeyCode.Z) and -1 or 0)
+                if lp.PlayerGui.Main.mobile and lp.PlayerGui.Main.mobile:FindFirstChild("A") then
+                    local A = lp.PlayerGui.Main.mobile:FindFirstChild("A")
+                    Y += (A.ImageRectOffset.X == 256 and 1 or 0) + (A.RT.ImageRectOffset.X == 256 and -1 or 0)
+                end
+            	workspace.char.AssemblyLinearVelocity = Vector3.new()
+            	workspace.char.Position += Vector3.new(0,Y -workspace.char.Position.Y,0) +(Mem.dir *2)
              	task.wait()
             until not fly.Toggled
         end
@@ -401,13 +408,12 @@ data.NewModule(function(module)
             for i, v in pairs(Mem.lockskin) do
                 local obt
                 for _, v in pairs(skins:GetChildren()) do
-                    if v:GetAttribute("id") == i then
-                    
+                    if v:GetAttribute("Id") == i or (v:FindFirstChild("id") and v:FindFirstChild("id").Value == i) then
                         obt = v
-                    	break
+                    	break;
                 	end
                 end
-                if obt and obt:FindFirstChild("icon") then
+                if obt and (obt:FindFirstChild("icon") or obt.TextureID) then
                     Mem.lockskin[i] = true
             	end
             end
