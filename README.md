@@ -14,8 +14,8 @@ You can use Zeouron on the following games:
 
 ## How to use
 1. Use a scripting utility. If you dont have one, these are some recommended utilities:
-- Mobile: [Delta](deltaexploits.gg)
-- Desktop: [Swift](getswift.vip)
+- Mobile: [Delta](https://deltaexploits.gg)
+- Desktop: [Swift](https://getswift.vip)
 
 2. Execute the following code while in a game:
 ```luau
