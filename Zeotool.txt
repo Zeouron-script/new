@@ -39,7 +39,7 @@ Contents.NewGui = function(name,zindex)
     G.DisplayOrder = (zindex or 0) +2000000000
     
     local scale = Instance.new("UIScale",G)
-    scale.Scale = 1.2 --workspace.CurrentCamera.ViewportSize.X / 1097
+    scale.Scale = workspace.CurrentCamera.ViewportSize.X / 1097
     
     return G,scale
 end
