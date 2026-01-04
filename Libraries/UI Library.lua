@@ -763,6 +763,8 @@ returntable.NewTab = function(name)
 	return tabenv
 end
 
+returntable.Scale = scaleup
+
 T.Notification("Zeouron", "Zeouron has successfully loaded, press M to open the UI",6)
 
 return returntable
