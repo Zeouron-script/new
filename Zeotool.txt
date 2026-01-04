@@ -36,8 +36,12 @@ Contents.NewGui = function(name,zindex)
     local G = Instance.new("ScreenGui",ZeouronGui)
     G.Name = name
     G.ResetOnSpawn = false
-    G.DisplayOrder = zindex and zindex +2000000000 or 2000000000
-    return G
+    G.DisplayOrder = (zindex or 0) +2000000000
+    
+    local scale = Instance.new("UIScale",G)
+    scale.Scale = workspace.CurrentCamera.ViewportSize.X / 1097
+    
+    return G,scale
 end
 
 --[[ {
@@ -255,7 +259,7 @@ end
 
 Contents.RunScript = function(foldername,name,githubfolder)
     local githubfolder = foldername --im lazy asf ok
-    if Contents.Developer then
+    if isfile("Zeouron/"..foldername.."/"..name..".lua") or Contents.Developer then
         local succ,res = pcall(loadstring(readfile("Zeouron/"..foldername.."/"..name..".lua")))
         if not succ then
             error(res)
