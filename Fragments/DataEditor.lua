@@ -83,11 +83,12 @@ return function(args)
     local Data = T.GetTheme()
     
     local G = UI.UIContents
+    local scaleup = UI.Scale
     
     local window = Instance.new("Frame")
 	window.AnchorPoint = Vector2.new(0.5,0.5)
 	window.Size = UDim2.new(0,350,0,400)
- 	window.Position = UDim2.new(0,workspace.CurrentCamera.ViewportSize.X /2,0,workspace.CurrentCamera.ViewportSize.Y /2)
+ 	window.Position = UDim2.new(0,(workspace.CurrentCamera.ViewportSize.X /2) *scaleup,0,(workspace.CurrentCamera.ViewportSize.Y /2) *scaleup)
 	window.BackgroundColor3 = Data.BgC
 	window.Visible = false
  	window.ZIndex = 1000
@@ -219,7 +220,7 @@ return function(args)
              	if typeof(value) ~= "table" then
                  	UI.Clean(game:GetService("RunService").Stepped:Connect(function()
                       	if frame.Parent == nil or game:GetService("UserInputService"):GetFocusedTextBox() then return end
-                       	if i:match(searchbox.Text) then
+                       	if string.lower(i):match(string.lower(searchbox.Text)) then
                             frame.Visible = true
                         else
                         	frame.Visible = false
@@ -296,7 +297,7 @@ return function(args)
               		local tablistsize = 0
                 	local loaded = false
                     list:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-                        local size = list.AbsoluteContentSize.Y
+                        local size = list.AbsoluteContentSize.Y *scaleup
                         tablistsize = size
                         if open then
                         	frame.Size = UDim2.new(1,0,0,tablistsize +50)
@@ -331,7 +332,7 @@ return function(args)
 	update(Table,modulelist)
 
     list:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-        modulelist.CanvasSize = UDim2.new(0,0,0,list.AbsoluteContentSize.Y)
+        modulelist.CanvasSize = UDim2.new(0,0,0,list.AbsoluteContentSize.Y *scaleup)
     end)
 
 	return window
