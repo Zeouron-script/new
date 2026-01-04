@@ -1,6 +1,9 @@
 local returntable = {}
 
-local G = T.NewGui("UI Library")
+local G,scale = T.NewGui("UI Library")
+
+local scaleup = 1 /scale.Scale
+local scaledown = scale.Scale
 
 local UIS = game:GetService("UserInputService")
 
@@ -87,15 +90,11 @@ end
 local enablebutton = Instance.new("ImageButton")
 enablebutton.Position = UDim2.new(1,-80,0.5)
 enablebutton.AnchorPoint = Vector2.new(0,0.5)
-enablebutton.Size = UDim2.new(0,45,0,45)
+enablebutton.Size = UDim2.new(0,60,0,60)
 enablebutton.ZIndex = 5
-enablebutton.BackgroundColor3 = Data.BgC
-enablebutton.BorderColor3 = Data.Color
-enablebutton.BorderSizePixel = 2
-enablebutton.Image = T.LoadAsset("Logo.png")
-enablebutton.ImageColor3 = Data.Color
+enablebutton.BackgroundTransparency = 1
+enablebutton.Image = T.LoadAsset("OpenerMain.png")
 enablebutton.ZIndex = 100000
-enablebutton.AutoButtonColor = false
 enablebutton.Parent = G
 
 returntable.Toggle = function()
@@ -135,7 +134,7 @@ local addtooltip = function(gui, text)
 
 	local function tooltipMoved(x, y)
      	tooltip.Visible = true
-		tooltip.Position = UDim2.new(0,x +5,0,y -game:GetService("GuiService"):GetGuiInset().Y +5)
+		tooltip.Position = UDim2.new(0,x *scaleup +(5 *scaleup),0,(y *scaleup +(5 *scaleup)) -(game:GetService("GuiService"):GetGuiInset().Y *scaleup))
 	end
 
 	gui.MouseEnter:Connect(function(x, y)
@@ -174,24 +173,44 @@ returntable.NewTab = function(name)
  	window.Position = UDim2.new(0,25 +(windows *195) -195,0,10)
 	window.BackgroundColor3 = Data.BgC
 	window.Visible = true
+ 	window.Active = true
+  	--[[window.Draggable = true]]
 	window.Parent = UIContents
 	T.AddBlur(window)
 	T.AddRound(window)
+ 
+ 	--[[local descendantfunc = function(v,ind)
+      	local ind = ind or index *25
+     	for _,b in pairs({"UICorner","UIStroke","UIListLayout"}) do
+        	if v:IsA(b) then
+            	return
+            end
+        end
+    	v.ZIndex += ind
+    end]]
  
 	local tabenv = {}
  	returntable.Tabs[name] = tabenv
  	tabenv.Index = index
  	tabenv.Frame = window
-  	tabenv.Remove = function() 
-       windows = windows -1
-       for _,v in pairs(returntable.Tabs) do
-           if v.Index > index then
-               v.Frame.Position -= UDim2.new(0,195,0,0)
-               v.Index -= 1
-           end
-       end
-       window:Destroy()
+   	tabenv.Enabled = true
+  	tabenv.Remove = function()
+       	windows = windows -1
+       	for _,v in pairs(returntable.Tabs) do
+           	if v.Index > index then
+               	v.Frame.Position -= UDim2.new(0,195,0,0)
+               	--v.Frame.ZIndex -= 25
+               	v.Index -= 1
+               
+               	--[[for _,v in pairs(v.Frame:GetDescendants()) do
+               		descendantfunc(v,-25)
+               	end]]
+           	end
+       	end
+       	window:Destroy()
     end
+
+	--window.DescendantAdded:Connect(descendantfunc)
  
  	local text = Instance.new("TextLabel")
 	text.Size = UDim2.new(1,0,0,33)
@@ -266,6 +285,7 @@ returntable.NewTab = function(name)
      
      	returntable.Modules[args.Name] = env
       	env.Remove = function() frame:Destroy() end
+       	env.Enable = function(bool) frame.Visible = bool end
      
      	if tooltip == nil then
           	local tooltipframe = Instance.new("Frame")
@@ -325,6 +345,8 @@ returntable.NewTab = function(name)
             local val = typeof(val) == "boolean" and val or not env.Toggled
             env.Toggled = val
             
+            env.Dots:WaitForChild("ImageLabel")
+            
             buttonframe.BackgroundTransparency = env.Toggled and 0 or 1
             env.Label.TextColor3 = env.Toggled and Color3.new(1,1,1) or Data.Color
             line.Visible = env.Toggled
@@ -370,7 +392,7 @@ returntable.NewTab = function(name)
         buttonframe.Activated:Connect(function()
             local clone = circle:Clone()
             local mousepos = UIS:GetMouseLocation()
-            clone.Position = UDim2.new(0,mousepos.X -buttonframe.AbsolutePosition.X,0,mousepos.Y -buttonframe.AbsolutePosition.Y -game:GetService("GuiService"):GetGuiInset().Y)
+            clone.Position = UDim2.new(0,mousepos.X *scaleup -(buttonframe.AbsolutePosition.X *scaleup),0,mousepos.Y *scaleup -(buttonframe.AbsolutePosition.Y *scaleup) -(game:GetService("GuiService"):GetGuiInset().Y *scaleup))
             clone.Parent = buttonframe
             
             T.Tween({
@@ -479,7 +501,7 @@ returntable.NewTab = function(name)
         
         addtooltip(label,args.Tooltip)
         
-        local valuelabel = Instance.new("TextLabel")
+        local valuelabel = Instance.new("TextBox")
       	valuelabel.Size = UDim2.new(1,0,0,33 /2)
        	valuelabel.AnchorPoint = Vector2.new(1)
        	valuelabel.Position = UDim2.new(1,-11)
@@ -490,6 +512,7 @@ returntable.NewTab = function(name)
         valuelabel.Font = Data.Font
         valuelabel.TextXAlignment = "Right"
         valuelabel.ZIndex = 2
+        valuelabel.ClearTextOnFocus = false
         valuelabel.Parent = frame
         
         local backbar = Instance.new("Frame")
@@ -531,20 +554,22 @@ returntable.NewTab = function(name)
             valuelabel.Text = math.round(val *10) /10
             func(val)
         end
+    
+    	valuelabel.FocusLost:Connect(function(ent)
+        	if ent and tonumber(valuelabel.Text) then
+            	env.SetValue(tonumber(valuelabel.Text))
+            else
+            	valuelabel.Text = env.Value
+            end
+        end)
         
         local moved = function(x) 
             if not holding then return end
-            local x = math.clamp(x -backbar.AbsolutePosition.X,0,backbar.AbsoluteSize.X)
-            local val = args.Min + ((args.Max -args.Min) *(x /backbar.AbsoluteSize.X))
+            local x = math.clamp(x *scaleup -(backbar.AbsolutePosition.X *scaleup),0,backbar.AbsoluteSize.X *scaleup)
+            local val = args.Min + ((args.Max -args.Min) *(x /(backbar.AbsoluteSize.X *scaleup)))
             env.Value = val
             
-            -- theres probably a better way to do this but im not good at math alright
-            local multi = 1
-            if round >0 then
-                for i=1,round do
-                	multi = i *10
-                end
-        	end
+            multi = 10^round
             
             valuelabel.Text = args.Suffix and args.Suffix(val) or math.round(val *multi) /multi
             
@@ -699,7 +724,7 @@ returntable.NewTab = function(name)
         end
 
 		list:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-        	local size = list.AbsoluteContentSize.Y
+        	local size = list.AbsoluteContentSize.Y *scaleup
          	if open and tabenv.Open then
         		env.Frame.Size = UDim2.new(0,185,0,size +33)
           	end
@@ -727,7 +752,7 @@ returntable.NewTab = function(name)
     end
 
 	list:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-        local size = list.AbsoluteContentSize.Y
+        local size = list.AbsoluteContentSize.Y *scaleup
     	modulelist.CanvasSize = UDim2.new(0,0,0,size)
         tablistsize = math.clamp(size +33,0, 13 *33)
         if open then
