@@ -259,7 +259,7 @@ end
 
 Contents.RunScript = function(foldername,name,githubfolder)
     local githubfolder = foldername --im lazy asf ok
-    if isfile("Zeouron/"..foldername.."/"..name..".lua") or Contents.Developer then
+    if Contents.Developer then
         local succ,res = pcall(loadstring(readfile("Zeouron/"..foldername.."/"..name..".lua")))
         if not succ then
             error(res)
