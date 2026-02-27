@@ -4,8 +4,20 @@ local RS = game:GetService("RunService")
 local UI = T.GetLibrary("UI Library")
 
 local Mem = getsenv(game.Players.LocalPlayer.PlayerScripts.CoreScript)._G
-local MenuConfig = require(game:GetService("ReplicatedStorage").MenuConfig)
-local TalentConfig = require(game:GetService("ReplicatedStorage").TalentConfig)
+local RST = game:GetService("ReplicatedStorage")
+ 
+local Mem = getsenv(lp.PlayerScripts.CoreScript)._G
+
+-- 😭🙏🙏🙏
+local MenuConfig = RST:FindFirstChild("MenuConfig") and require(RST.MenuConfig)
+			     or require(RST.Scripts.ConfigScripts.MenuConfig)
+local TalentConfig = RST:FindFirstChild("TalentConfig") and require(RST.TalentConfig)
+					 or (function()
+          				TalentConfig = {}
+ 						for _,v in pairs(RST.Talents:GetChildren()) do
+    						TalentConfig[v.Name] = require(v)
+    					end
+          			 end)()
 
 local blatant = UI.NewTab("Blatant")
 local stats = UI.NewTab("Stats")
