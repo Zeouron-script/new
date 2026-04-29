@@ -1,3 +1,7 @@
+local round = function(num,decimals)
+    return math.round(num *10^decimals) /10^decimals
+end
+
 local IgnoredValues = {
     "Instance"
 }
@@ -6,7 +10,7 @@ local ValueData = {
     number = {
         FrameType = "TextBox",
         TextSet = function(val)
-            return tostring(math.round(val *100) /100)
+            return tostring(round(val,2))
         end,
     	OnFocus = function(table,index) end,
      	OnLostFocus = function(table,index,frame) 
@@ -66,7 +70,19 @@ local ValueData = {
     	Clicked = function(val)
         	val()
         end
-    }
+    },
+	Vector3 = {
+        FrameType = "TextLabel",
+        TextSet = function(val)
+            return round(val.X,2)..", "..round(val.Y,2)..", "..round(val.Z,2)
+        end
+    },
+	Instance = {
+        FrameType = "TextLabel",
+        TextSet = function(val)
+            return val:GetFullName()
+        end
+    },
 }
 
 local DefaultData = {
@@ -91,13 +107,14 @@ return function(args)
  	window.Position = UDim2.new(0,(workspace.CurrentCamera.ViewportSize.X /2) *scaleup,0,(workspace.CurrentCamera.ViewportSize.Y /2) *scaleup)
 	window.BackgroundColor3 = Data.BgC
 	window.Visible = false
- 	window.ZIndex = 1000
+ 	window.BackgroundTransparency = 0.05
+ 	window.ZIndex = 20
 	window.Parent = G
 	T.AddBlur(window)
 	T.AddRound(window)
  
  	window.DescendantAdded:Connect(function(v)
-    	v.ZIndex += 1000
+    	v.ZIndex += 20
     end)
  
  	local textlabel = Instance.new("TextLabel")

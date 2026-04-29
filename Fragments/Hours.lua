@@ -3,12 +3,9 @@ local RS = game:GetService("RunService")
 
 local UI = T.GetLibrary("UI Library")
 
-local Mem = getsenv(game.Players.LocalPlayer.PlayerScripts.CoreScript)._G
 local RST = game:GetService("ReplicatedStorage")
  
 local Mem = getsenv(lp.PlayerScripts.CoreScript)._G
-
--- 😭🙏🙏🙏
 local MenuConfig = RST:FindFirstChild("MenuConfig") and require(RST.MenuConfig)
 			     or require(RST.Scripts.ConfigScripts.MenuConfig)
 local TalentConfig = RST:FindFirstChild("TalentConfig") and require(RST.TalentConfig)
@@ -67,8 +64,30 @@ end)
 
 misc.NewModule(function(module)
     nontarget = module.NewSwitch({
-        Name = "Non target",
+        Name = "Ghost",
         Tooltip = "Makes it so entities dont go after you"
+    })
+end)
+
+misc.NewModule(function(module)
+    nowindups = module.NewSwitch({
+        Name = "No windups",
+        Function = function(bool)
+            --if not bool then return end
+            repeat
+                if Mem.Entities[1].SpeedMultiplier == 0 then
+                    repeat
+                        --Mem.TimeControl.Active = true
+                        Mem.Entities[1].TimeSpeed = 1000
+                        Mem.TimeControl.FrameDelta = 1
+                        task.wait()
+                    until Mem.Entities[1].SpeedMultiplier ~= 0
+                	Mem.Entities[1].TimeSpeed = 1
+                end
+            	task.wait()
+            until not nowindups.Toggled
+        end,
+    	Tooltip = "you must use rush (tempo) because im too lazy to fix it\nim the best programmer who has ever touched a keyboard"
     })
 end)
 

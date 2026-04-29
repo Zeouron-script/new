@@ -14,19 +14,6 @@ local misc = UI.NewTab("Misc")
 local data = UI.NewTab("Data")
 
 UI.OnContentsVisibility = function(val)
-	if not val and Mem.UI then
-        for i,v in pairs(lp.PlayerGui:GetChildren()) do
-            if v.Name == "FakeUI" then
-                v:Destroy()
-            end
-        end
-     	Mem.UI.Enabled = true
- 	elseif val == true and Mem.UI then
-  		fakeui = Mem.UI:Clone()
-    	fakeui.Name = "FakeUI"
-    	fakeui.Parent = lp.PlayerGui
-     	Mem.UI.Enabled = false
-    end
 	isinui = val
     Mem.pause(val)
 end

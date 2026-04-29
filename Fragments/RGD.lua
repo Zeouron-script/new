@@ -5,10 +5,8 @@ local UIS = game:GetService("UserInputService")
 local UI = T.GetFragment("Universal")
 
 misc.Remove()
-render.Remove()
 
 local notifications = getsenv(game:GetService("Players").LocalPlayer.PlayerGui.Notifier.NotificationMaker)
-
 
 local notouch = function(v)
     for _,v in pairs(v:GetDescendants()) do
@@ -43,27 +41,24 @@ GetEnemies = function()
 	return tble
 end
 
+Universal.GetTargets = GetEnemies
+Universal.GetColorForTarget = function(char)
+    return char:WaitForChild("HumanoidRootPart").BrickColor ~= BrickColor.new("Medium stone grey") and char:WaitForChild("HumanoidRootPart").Color or Color3.new(1,1,1)
+end
+Universal.GetNameForTarget = function(char)
+    return char:FindFirstChild("Tags") and char.Tags:FindFirstChild("Source") and char.Tags.Source.Value or char.Name
+end
+
 local Data = T.GetTheme()
 
 local world = UI.NewTab("World")
-local misc = UI.NewTab("Misc")
-
-misc.NewModule(function(module)
-    local msg = "reminder to add textboxes to ui library"
-    module.NewButton({
-        Name = "Notify",
-        Tooltip = "Makes a notification with the rgd ui",
-        Function = function(val)
-            notifications.addNotification(msg)
-        end
-    })
-end)
 
 world.NewModule(function(module)
     antihazard = module.NewSwitch({
         Name = "Anti Hazard",
         Tooltip = "Makes it so you dont take damage from lava,water,acid etc",
         Function = function(val)
+            if not val then return end
             repeat
                 for _,v in pairs(GetRooms()) do
                 	for _,v in pairs(v:GetChildren()) do
@@ -82,6 +77,7 @@ util.NewModule(function(module)
     autoclicker = module.NewSwitch({
         Name = "Autoclicker",
         Function = function(val)
+            if not val then return end
             repeat
                 if lp.character:FindFirstChildWhichIsA("Tool") and lp.character:FindFirstChildWhichIsA("Tool"):FindFirstChild("SwordScript") then
                     lp.character:FindFirstChildWhichIsA("Tool"):Activate()
@@ -97,6 +93,7 @@ util.NewModule(function(module)
         Name = "Auto button",
         Tooltip = "Clicks buttons necessary for progression (mystery buttons, regular buttons etc)",
         Function = function(val)
+            if not val then return end
             repeat
                 for _,v in pairs(GetRooms()) do
                 	if v:FindFirstChild("Enemies") then
@@ -124,6 +121,7 @@ util.NewModule(function(module)
         Name = "Auto pickup",
         Tooltip = "Automatically picks up circuits and items.",
         Function = function(val)
+            if not val then return end
             repeat
                 for _,v in pairs(workspace:GetChildren()) do
                 	if v:FindFirstChild("CircuitScript") then
@@ -141,6 +139,7 @@ util.NewModule(function(module)
         Name = "Anti invisible",
         Tooltip = "Makes it so you can see ghost droids while theyre invisible",
         Function = function(val)
+            if not val then return end
             repeat
                 for _,v in pairs(GetEnemies()) do
                 	if v.Tags.Source.Value == "Ghost Droid" or v.Tags.Source.Value == "Camo Droid" then
@@ -161,6 +160,7 @@ blatant.NewModule(function(module)
     godmode = module.NewSwitch({
         Name = "Godmode",
         Function = function(val)
+            if not val then return end
             repeat
                 for _,v in pairs(GetEnemies()) do
                 	notouch(v)
@@ -171,13 +171,21 @@ blatant.NewModule(function(module)
     })
 end)
 
+local kill = function(hum)
+    hum.Health = 0
+end
+
 blatant.NewModule(function(module)
     local friendly,anti
+    local affected = {}
     killall = module.NewButton({
         Name = "Kill all",
         Function = function()
             for _,v in pairs(GetEnemies()) do
-            	v.Enemy.Health = 0
+                if not table.find(affected,v) then
+                    table.insert(affected,v)
+                	task.spawn(kill,v.Enemy)
+              	end
             end
         	if friendly.Toggled or anti.Toggled then
             	for _,v in pairs(workspace.PassiveDroids:GetChildren()) do
@@ -202,7 +210,8 @@ blatant.NewModule(function(module)
     autokill = module.NewSwitch({
         Name = "Auto Kill",
         Tooltip = "(settings convert to this module aswell)",
-        Function = function()
+        Function = function(val)
+            if not val then return end
             repeat
                 killall:Function()
                 task.wait(0.25)
@@ -215,7 +224,8 @@ blatant.NewModule(function(module)
     freeze = module.NewSwitch({
         Name = "Freeze Droids",
         Tooltip = "Makes droids unable to move",
-        Function = function()
+        Function = function(val)
+            if not val then return end
             repeat
                 for _,v in pairs(GetEnemies()) do
                 	v.Enemy.WalkSpeed = 0

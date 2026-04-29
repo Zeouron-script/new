@@ -11,8 +11,32 @@ movement = UI.NewTab("Movement")
 blatant = UI.NewTab("Blatant")
 render = UI.NewTab("Render")
 util = UI.NewTab("Utillity")
---blatant = UI.NewTab("World")
+--world = UI.NewTab("World")
 misc = UI.NewTab("Misc")
+
+Universal = {}
+Universal.IsValidEntity = function(ent,death)
+    local death = death or false
+    if not ent then return false end
+    local hum = ent:FindFirstChildWhichIsA("Humanoid")
+    return (hum and (not death or hum.Health > 0) and ent:FindFirstChild("Head") and ent:FindFirstChild("HumanoidRootPart")) and true or false
+end
+Universal.GetTargets = function()
+    local t = {}
+	for _,v in pairs(game.Players:GetChildren()) do
+     	if v ~= lp then
+    		table.insert(t,v.Character)
+     	end
+    end
+	return t
+end
+Universal.GetColorForTarget = function(char)
+    local plr = game.Players:GetPlayerFromCharacter(char)
+    return plr and plr.TeamColor.Color or Color3.new(1,1,1)
+end
+Universal.GetNameForTarget = function(char)
+    return char:FindFirstChildWhichIsA("Humanoid") and char:FindFirstChildWhichIsA("Humanoid").DisplayName or char.Name
+end
 
 blatant.NewModule(function(module)
     local value
@@ -56,7 +80,7 @@ movement.NewModule(function(module)
         Tooltip = "Makes you walk/sprint faster.",
         Function = function(val)
         	RS.Stepped:Connect(function()
-            	if speed.Toggled and lp.character and lp.character:FindFirstChild("HumanoidRootPart") and lp.character:FindFirstChildWhichIsA("Humanoid") then
+            	if speed.Toggled and Universal.IsValidEntity(lp.character,true) then
                  	local movedir = lp.character:FindFirstChildWhichIsA("Humanoid").MoveDirection
                 	local root = lp.character.HumanoidRootPart
                  	root.AssemblyLinearVelocity = movedir *Vector3.new(value.Value, 0, value.Value) +Vector3.new(0,root.AssemblyLinearVelocity.Y)
@@ -81,7 +105,7 @@ movement.NewModule(function(module)
         Tooltip = "Makes you jump higher.",
         Function = function(val)
         	RS.Stepped:Connect(function()
-            	if jumpheight.Toggled and lp.character and lp.character:FindFirstChildWhichIsA("Humanoid") then
+            	if jumpheight.Toggled and Universal.IsValidEntity(lp.character,true) then
                 	lp.character:FindFirstChildWhichIsA("Humanoid").JumpPower = value.Value
                 end
             end)
@@ -142,7 +166,7 @@ movement.NewModule(function(module)
             end
         
         	conn = RS.Stepped:Connect(function()
-            	if lp.character and lp.character:FindFirstChild("HumanoidRootPart") and lp.character:FindFirstChildWhichIsA("Humanoid") then
+            	if Universal.IsValidEntity(lp.character,true) then
                  	if not Y then
                     	Y = lp.character.HumanoidRootPart.Position.Y
                     end
@@ -152,9 +176,7 @@ movement.NewModule(function(module)
                  	local movedir = lp.character:FindFirstChildWhichIsA("Humanoid").MoveDirection
                 	local root = lp.character.HumanoidRootPart
                  	root.AssemblyLinearVelocity = (movedir *Vector3.new(value.Value, 0, value.Value))
-                  
-                  	local remove = gravity.Toggled and up == 0 and lp.character:FindFirstChildWhichIsA("Humanoid").FloorMaterial == Enum.Material.Air and 0.15 or 0
-                  	Y += up *0.5 -remove
+                  	Y += up *0.5
                   	root.CFrame *= CFrame.new(0,Y -root.Position.Y,0)
                 elseif fly.Toggled then
                 	Y = nil
@@ -169,11 +191,6 @@ movement.NewModule(function(module)
       	Min = 0,
        	Max = 100,
         Default = 32
-    })
-
-	gravity = fly.NewSwitch({
-    	Name = "Gravity",
-     	Tooltip = "Makes you go down if you arent pressing X or Z\nUseful for mobile users that cant press X to go down."
     })
 end)
 
@@ -206,14 +223,16 @@ render.NewModule(function(module)
         Function = function(val)
             if val then
                 connection = RS.Stepped:Connect(function()
-                    for _,v in pairs(game.Players:GetChildren()) do
-                    	if v.character and not v.character:FindFirstChild("chams") and not table.find(objs,v.character:FindFirstChild("chams")) then
+                    for _,v in pairs(Universal.GetTargets()) do
+                    	if not v:FindFirstChild("chams") and not table.find(objs,v:FindFirstChild("chams")) then
                         	local hl = Instance.new("Highlight")
                          	table.insert(objs,hl)
                           	hl.Name = "chams"
-                           	hl.FillColor = Data.Color
+                           	hl.FillColor = Universal.GetColorForTarget(v)
                             hl.OutlineTransparency = 1
-                            hl.Parent = v.character
+                            hl.Parent = v
+                        else
+                        	v:FindFirstChild("chams").FillColor = Universal.GetColorForTarget(v)
                         end
                     end
                 end)
@@ -229,9 +248,11 @@ render.NewModule(function(module)
     })
 end)
 
+espgui = T.NewGui("ESP",-2000001000)
 render.NewModule(function(module)
     local value
     local objs = {}
+    local affected = {}
     local connection
     nametags = module.NewSwitch({
         Name = "Nametags",
@@ -239,34 +260,37 @@ render.NewModule(function(module)
         Function = function(val)
             if val then
                 connection = RS.Stepped:Connect(function()
-                    for _,v in pairs(game.Players:GetChildren()) do
-                    	if v.character and v.character:FindFirstChild("Head") and not v.character:FindFirstChild("nametag") and not table.find(objs,v.character:FindFirstChild("chams")) then
-                        	local nametag = Instance.new("BillboardGui")
-                         	table.insert(objs,nametag)
-                          	nametag.Name = "nametag"
-                           	nametag.AlwaysOnTop = true
-                            nametag.Size = UDim2.new(0,1,0,1)
-                            nametag.Adornee = v.character.Head
-                            nametag.Parent = v.character
-	
- 							--[[
-                            local params = Instance.new("GetTextBoundsParams")
-                            params.Text = v.Name
-                            params.Size = 18
-                            params.Font = Data.Font
-                            params.Width = math.huge]]
-                            
-                            local frame = Instance.new("TextLabel")
+                    for _,v in pairs(Universal.GetTargets()) do
+                        local plr = game.Players:GetPlayerFromCharacter(v)
+                        local name = (plr and plr.Name) or v.Name
+                        local frame,normalsize
+                    	if Universal.IsValidEntity(v) and not table.find(affected,v) then
+                            local conn
+                            frame = Instance.new("TextLabel")
                             frame.AnchorPoint = Vector2.new(0.5,0.5)
                             frame.BackgroundColor3 = Data.BgC
                             frame.BackgroundTransparency = 0.33
                             frame.BorderSizePixel = 0
-                            frame.Size = UDim2.new(0,--[[game:GetService("TextService"):GetTextBoundsAsync(params)]] 100,0,20)
+                            frame.Size = UDim2.new(0,game:GetService("TextService"):GetTextSize(v.Name, 18, Data.Font, Vector2.new(math.huge, math.huge)).X +2,0,20)
+                            frame.Name = name
                             frame.Text = v.Name
-                            frame.TextColor3 = Data.Color
+                            frame.TextColor3 = Universal.GetColorForTarget(v)
                             frame.TextSize = 18
                             frame.Font = Data.Font
-                            frame.Parent = nametag
+                            frame.Parent = espgui
+                            table.insert(affected,v)
+                            conn = game:GetService("RunService").RenderStepped:Connect(function()
+                                if not Universal.IsValidEntity(v) or not nametags.Toggled then frame:Destroy() conn:Disconnect() return end
+                            	frame.TextColor3 = Universal.GetColorForTarget(v)
+                             	local normalsize = UDim2.new(0,game:GetService("TextService"):GetTextSize(v.Name, 18, Data.Font, Vector2.new(math.huge, math.huge)).X +2,0,20)
+                            	local pos,vis = workspace.CurrentCamera:WorldToScreenPoint(v.Head.Position)
+                            	local dis = (v.Head.Position -workspace.CurrentCamera.CFrame.Position).Magnitude
+                             	frame.Visible = vis
+                            	frame.Position = UDim2.new(0,pos.x,0,pos.y)
+                             	local multi = math.clamp(1 +(dis /300),1,2)
+                             	frame.Size = UDim2.new(0,normalsize.X.Offset /multi,0,normalsize.Y.Offset /multi)
+                              	frame.TextSize = 18 /multi
+                            end)
                         end
                     end
                 end)
@@ -274,12 +298,56 @@ render.NewModule(function(module)
             	if connection then
                 	connection:Disconnect()
                 end
-            	for _,v in pairs(objs) do
+            	for _,v in pairs(espgui:GetChildren()) do
                 	v:Destroy()
                 end
         	end
         end
     })
+end)
+
+render.NewModule(function(module)
+    local isdisguised = false
+    local setdesc = function(desc)
+        repeat task.wait() until lp.character and Universal.IsValidEntity(lp.character)
+        
+        for _,v in pairs(lp.character:GetChildren()) do
+            if v:IsA("Shirt") or v:IsA("Pants") or v:IsA("CharacterMesh") or v:IsA("Accessory") then
+                v:Destroy()
+            end
+        end
+        
+        lp.character.Humanoid:ApplyDescriptionClientServer(desc)
+    end
+    
+    disguise = module.NewSwitch({
+        Name = "Disguise",
+        Tooltip = "Sets your avatar to anyone/anything (client sided)",
+        Function = function(val)
+            if val then
+                setdesc(game.Players:GetHumanoidDescriptionFromUserId(tonumber(id.Value) or 10))
+            elseif isdisguised then
+            	setdesc(game.Players:GetHumanoidDescriptionFromUserId(lp.UserId))
+            end
+            isdisguised = val
+        end
+    })
+
+	id = disguise.NewTextBox({
+    	Name = "Player ID",
+     	Default = "1",
+      	Function = function(v)
+           if disguise.Toggled and tonumber(v) then
+               setdesc(game.Players:GetHumanoidDescriptionFromUserId(v))
+           end
+        end
+    })
+
+	lp.CharacterAdded:Connect(function()
+     	if not disguise.Toggled then return end
+    	task.wait(1)
+     	setdesc(game.Players:GetHumanoidDescriptionFromUserId(tonumber(id.Value) or 10))
+    end)
 end)
 
 util.NewModule(function(module)
