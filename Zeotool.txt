@@ -22,6 +22,7 @@ ZeouronGui.ResetOnSpawn = false
 
 Contents = {}
 
+Contents.GetGuiParent = GetGuiParent
 Contents.Github = "https://raw.githubusercontent.com/Zeouron-script/new/refs/heads/main/"
 
 Contents.IsMobile = table.find({Enum.Platform.IOS, Enum.Platform.Android}, UIS:GetPlatform())
@@ -37,6 +38,9 @@ Contents.NewGui = function(name,zindex)
     G.Name = name
     G.ResetOnSpawn = false
     G.DisplayOrder = (zindex or 0) +2000000000
+    G.ZIndexBehavior = Enum.ZIndexBehavior.Global
+    G.OnTopOfCoreBlur = true
+    G.IgnoreGuiInset = true
     
     local scale = Instance.new("UIScale",G)
     scale.Scale = workspace.CurrentCamera.ViewportSize.X / 1097
@@ -65,13 +69,9 @@ Contents.ConstructFolder = function()
 
 If you are reading this I assume your a developer of some sort.
 
-If you are viewing the src or stealing some code, then keep in mind of the LICENSE
-
-If you are modifying Zeouron's code for whatever reason then keep in mind it'll get overwritten upon a update.
+If you are modifying Zeouron's code for whatever reason then keep in mind that upon execution, it'll get overwritten
 You can turn this off by turning on Developer mode, you can do this in the settings file
-if you dont know, the path to it is: "workspace/Zeouron/Profiles/Settings.txt"
-
-Good luck, whoever you are.]],true)
+if you dont know, the path to it is: "workspace/Zeouron/Profiles/Settings.txt"]],true)
 
 	add("Zeouron/Version.txt",game:HttpGet(Contents.Github.."Version.txt"),true)
  
@@ -125,16 +125,18 @@ Contents.DownloadAsset = function(asset)
         wait(0.1)
         return "Zeouron/Assets/"..asset
     else
-        warn("Failed to Download asset")
-        return ""
+        print("Failed to Download asset")
+        return "rbxassetid://7733658271"
     end
 end
 Contents.LoadAsset = function(asset)
 	local fakeasset = getcustomasset or getsynasset
-	if isfile("Zeouron/Assets/"..asset) then
+	if isfile("Zeouron/Assets/"..asset) and fakeasset then
 		return fakeasset("Zeouron/Assets/"..asset)
-	else
-   		return fakeasset(Contents.DownloadAsset(asset))
+	elseif fakeasset then
+   		return fakeasset(Contents.DownloadAsset(asset)) or "rbxassetid://7733658271"
+    else
+    	return "rbxassetid://7733658271"
    	end
 end
 Contents.AddBlur = function(frame)
@@ -150,10 +152,10 @@ Contents.AddBlur = function(frame)
     blur.Parent = frame
     return blur
 end
-Contents.AddRound = function(frame,roundyness)
+Contents.AddRound = function(frame,roundyness,scale)
     local round = Instance.new("UICorner")
     round.Parent = frame
-    round.CornerRadius = roundyness and UDim.new(0,roundyness) or UDim.new(0,5)
+    round.CornerRadius = not scale and (roundyness and UDim.new(0,roundyness) or UDim.new(0,5)) or UDim.new(1,1)
     return round
 end
 Contents.AddStroke = function(frame,color,thickness)
@@ -180,15 +182,18 @@ local G = Contents.NewGui("ZeoTool",100)
 
 local notifs = {}
 Contents.Notification = function(title, desc, time)
+    local self = {}
+    
     local notification = Instance.new("Frame",G)
     notification.BackgroundColor3 = Contents.GetTheme().BgC
-    notification.Size = UDim2.new(0,300,0,125)
-    notification.Position = UDim2.new(1,-320,1,-145 -(#notifs *135))
+    notification.Size = UDim2.new(0,240,0,100)
+    notification.Position = UDim2.new(1,-20,1,-20 -(#notifs *105))
+    notification.AnchorPoint = Vector2.new(1,1)
     notification.ZIndex = 100
     
     local titlelabel = Instance.new("TextLabel",notification)
     titlelabel.Text = title
-    titlelabel.Size = UDim2.new(1,-10,0,25)
+    titlelabel.Size = UDim2.new(1,-10,0,17)
     titlelabel.Position = UDim2.new(0,5,0,5)
     titlelabel.Font = Contents.GetTheme().Font
     titlelabel.TextColor3 = Contents.GetTheme().Color
@@ -199,8 +204,8 @@ Contents.Notification = function(title, desc, time)
     
     local desclabel = Instance.new("TextLabel",notification)
     desclabel.Text = desc
-    desclabel.Size = UDim2.new(1,-10,1,-35)
-    desclabel.Position = UDim2.new(0,5,0,35)
+    desclabel.Size = UDim2.new(1,-10,1,-25)
+    desclabel.Position = UDim2.new(0,5,0,25)
     desclabel.Font = Contents.GetTheme().Font
     desclabel.TextColor3 = Contents.GetTheme().Color
     desclabel.TextSize = 17
@@ -210,51 +215,66 @@ Contents.Notification = function(title, desc, time)
     desclabel.TextWrapped = true
     desclabel.ZIndex = 102
     
-    local timebar = Instance.new("Frame",notification)
-    timebar.Size = UDim2.new(1,-20,0,10)
-    timebar.Position = UDim2.new(0,10,1,-20)
-    timebar.BackgroundColor3 = Contents.GetTheme().Color
-    timebar.ZIndex = 102
-    
     local timebarbg = Instance.new("Frame",notification)
-    timebarbg.Size = UDim2.new(1,-20,0,10)
-    timebarbg.Position = UDim2.new(0,10,1,-20)
+    timebarbg.Size = UDim2.new(1,-10,0,5)
+    timebarbg.Position = UDim2.new(0,5,1,-10)
     timebarbg.BackgroundColor3 = Contents.GetTheme().DarkC
     timebarbg.ZIndex = 101
     
-    Contents.AddRound(timebar,2)
-    Contents.AddRound(timebarbg,2)
+    local timebar = Instance.new("Frame",timebarbg)
+    timebar.Size = UDim2.new(1,1,1,1)
+    timebar.BackgroundColor3 = Contents.GetTheme().Color
+    timebar.ZIndex = 102
+    
+    Contents.AddRound(timebar,0,true)
+    Contents.AddRound(timebarbg,0,true)
     
     Contents.AddRound(notification)
     Contents.AddBlur(notification)
     
-    Contents.Tween({
-        timebar,
-        "Size",
-        time,
-        UDim2.new(0,0,0,10)
-    })
-	task.spawn(function(time,notification)
-    	task.wait(time +0.05)
-     	Contents.Tween({
+    self.Closed = false
+    self.Close = function()
+    	Contents.Tween({
             notification,
             "Position",
             0.35,
-            UDim2.new(1,10,1,notification.Position.Y.Offset)
+            UDim2.new(1,250,1,notification.Position.Y.Offset)
         })
+    	self.Closed = true
     	task.wait(0.35)
      	table.remove(notifs, table.find(notifs, notification))
      	notification:Destroy()
       	for _,v in pairs(notifs) do
-           	Contents.Tween({
-                v,
-                "Position",
-                0.35,
-                UDim2.new(1,-320,1,v.Position.Y.Offset +135)
-            })
+        	if v.Position.Y.Offset <notification.Position.Y.Offset then
+             	v.Position += UDim2.new(0,0,0,105)
+        	end
         end
-    end,time,notification)
-	table.insert(notifs,notification)
+    end
+	self.Wait = function()
+    	repeat
+        	task.wait()
+        until self.Closed
+    end
+    
+
+	if time then
+        Contents.Tween({
+            timebar,
+            "Size",
+            time,
+            UDim2.new(0,1,1,1)
+        })
+    	task.spawn(function(time)
+        	task.wait(time +0.05)
+         	self.Close()
+        end,time)
+    else
+    	timebar.Visible = false
+     	timebarbg.Visible = false
+ 	end
+    table.insert(notifs,notification)
+ 
+ 	return self
 end
 
 Contents.RunScript = function(foldername,name,githubfolder)
@@ -280,10 +300,13 @@ Contents.GetFragment = function(fragment)
     return Contents.RunScript("Fragments",fragment)
 end
 Contents.GetConfig = function(config)
-    return Contents.RunScript("Configurations",config)
+   	return Contents.RunScript("Configurations",config)
 end
 Contents.GetLibrary = function(lib)
     return Contents.RunScript("Libraries",lib)
+end
+Contents.GetProfile = function(profile)
+    return readfile("Zeouron/Profiles/"..profile..".txt")
 end
 
 Contents.Popups = {}
