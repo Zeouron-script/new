@@ -238,15 +238,21 @@ blatant.NewModule(function(module)
         Tooltip = "Allows you to fly\nX = up\nZ = down",
         Function = function(val)
             if not val then return end
-        	local Y = workspace.char.Position.Y
+        	local Y = workspace:WaitForChild("char",10000).Position.Y
+            local mobileui = lp.PlayerGui:FindFirstChild("mobile",true)
             repeat
                 Y += (UIS:IsKeyDown(Enum.KeyCode.X) and 1 or 0) + (UIS:IsKeyDown(Enum.KeyCode.Z) and -1 or 0)
-                if lp.PlayerGui.Main.mobile and lp.PlayerGui.Main.mobile:FindFirstChild("A") then
-                    local A = lp.PlayerGui.Main.mobile:FindFirstChild("A")
+                if T.IsMobile and not mobileui then
+                	mobileui = lp.PlayerGui:FindFirstChild("mobile",true)
+                end
+                if mobileui and mobileui:FindFirstChild("A") then
+                    local A = mobileui:FindFirstChild("A")
                     Y += (A.ImageRectOffset.X == 256 and 1 or 0) + (A.RT.ImageRectOffset.X == 256 and -1 or 0)
                 end
-            	workspace.char.AssemblyLinearVelocity = Vector3.new()
-            	workspace.char.Position += Vector3.new(0,Y -workspace.char.Position.Y,0) +(Mem.dir *2)
+            	if workspace:FindFirstChild("char") and Mem.dir then
+                	workspace.char.AssemblyLinearVelocity = Vector3.new()
+                	workspace.char.Position += Vector3.new(0,Y -workspace.char.Position.Y,0) +(Mem.dir *2)
+             	end
              	task.wait()
             until not fly.Toggled
         end
